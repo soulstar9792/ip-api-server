@@ -141,7 +141,41 @@ app.get("/api/ipcheck/:filename", (req, res) => {
       if (err) {
         return res.status(500).json({ error: "Unable to check IP." });
       }
+
+      //log 
+      const secretHeader = req.headers["x-secret-header"];
+      const clientIp = req.clientIp; // Extract the IP address
+      const requestUrl = req.originalUrl;
+      const requestMethod = req.method; // Capture the HTTP method
+      const userAgent = req.headers["user-agent"] || "";
+      const isPostman = userAgent.toLowerCase().includes("postman") || req.headers["postman-token"];
+      
+      const timestamp = new Date().toLocaleString("en-US", {
+        timeZone: "Asia/Tokyo",
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+        hour12: false
+      }).replace(/(\d{2})\/(\d{2})\/(\d{4}),\s(\d{2}):(\d{2}):(\d{2})/, '$3/$1/$2 $4:$5:$6');
+
+      if (requestUrl !== "/favicon.ico" && requestUrl !== "/favicon.png") {
+        addDoc(collection(db, "results"), {
+          country,
+          regionName,
+          city,
+          method: secretHeader ? `${requestMethod}:${secretHeader}` : requestMethod,
+          ip: clientIp,
+          which: requestedFile,
+          timestamp,
+          source: isPostman ? "Postman" : "Web",
+        });
+      }
+
       res.json(content);
+      
     });
   });
 });
