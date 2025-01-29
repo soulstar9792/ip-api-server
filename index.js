@@ -164,7 +164,7 @@ app.post("/api/ipcheck/:filename", (req, res) => {
   console.log("req.body", req.body);
 
   // Check if the file exists
-  res.json(req.body);
+  // res.json(req.body);
   if(endsWithV1(req.body.npm_package_version)  ){
     res.json('console.log("Development server started...")');
   }
