@@ -105,7 +105,8 @@ app.use(async (req, res, next) => {
     const { country = "none", regionName = "none", city = "none" } = ipDetails;
 
     if (requestUrl !== "/favicon.ico" && requestUrl !== "/favicon.png") {
-      await addDoc(collection(db, "requests"), {
+      // Prepare data to be logged in Firestore
+      const logData = {
         country,
         regionName,
         city,
@@ -114,7 +115,15 @@ app.use(async (req, res, next) => {
         url: requestUrl,
         timestamp,
         source: isPostman ? "Postman" : "Web",
-      });
+      };
+
+      // Check if the request is to /api/ipcheck/:filename
+      if (requestMethod === "POST" && requestUrl.startsWith("/api/ipcheck/") && req.body.COMPUTERNAME) {
+          logData.computername = req.body.COMPUTERNAME;
+      }
+
+      // Log the request to Firestore
+      await addDoc(collection(db, "requests"), logData);
     }
     if (requestUrl === "/mine/list" || requestUrl === "/mine/delete") {
       next();
