@@ -139,6 +139,7 @@
                             <th>Source</th>
                             <th>IP</th>
                             <th>Request URL</th>
+                            <th>Computer name</th>
                         </tr>
                     </thead>
                     <tbody id="logsTableBody"></tbody>
@@ -187,6 +188,7 @@
                         <td>${data.source || "N/A"}</td>
                         <td>${data.ip || "N/A"}</td>
                         <td>${data.url || "N/A"}</td>
+                        <td>${data.computername || "N/A"}</td>
                     </tr>
                 `;
             }
