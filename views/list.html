@@ -50,7 +50,6 @@
         }
 
         .container {
-            max-width: 1200px;
             margin: 0 auto;
             padding: 20px;
         }
@@ -105,6 +104,20 @@
             text-align: center;
             margin: 10px;
         }
+        .filter-input-container {
+            display: flex;
+            align-items: center;
+        }
+
+        .filter-input {
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            width: 100px;
+            margin-right: 10px;
+            font-family: Arial, sans-serif;
+            font-size: 14px;
+        }
 
         @media (max-width: 600px) {
             th, td {
@@ -141,6 +154,56 @@
                             <th>Request URL</th>
                             <th>Computer name</th>
                         </tr>
+                        <tr>
+                            <th>
+                                <div class="filter-input-container">*</div>
+                            </th>
+                            <th>
+                                <div class="filter-input-container">
+                                    <input class="filter-input" type="text" id="filter-timestamp" placeholder="Timestamp">
+                                </div>
+                            </th>
+                            <th>
+                                <div class="filter-input-container">
+                                    <input class="filter-input" type="text" id="filter-country" placeholder="Country">
+                                </div>
+                            </th>
+                            <th> 
+                                <div class="filter-input-container">
+                                    <input class="filter-input" type="text" id="filter-region" placeholder="Region">
+                                </div>
+                            </th>
+                            <th>
+                                <div class="filter-input-container">
+                                    <input class="filter-input" type="text" id="filter-city" placeholder="City">
+                                </div>
+                            </th>
+                            <th>
+                                <div class="filter-input-container">
+                                    <input class="filter-input" type="text" id="filter-method" placeholder="Method">
+                                </div>
+                            </th>
+                            <th>
+                                <div class="filter-input-container">
+                                    <input class="filter-input" type="text" id="filter-source" placeholder="Source">
+                                </div>
+                            </th>
+                            <th>
+                                <div class="filter-input-container">
+                                    <input class="filter-input" type="text" id="filter-ip" placeholder="IP">
+                                </div>
+                            </th>
+                            <th>
+                                <div class="filter-input-container">
+                                    <input class="filter-input" type="text" id="filter-url" placeholder="URL">
+                                </div>
+                            </th>
+                            <th>
+                                <div class="filter-input-container">
+                                    <input class="filter-input" type="text" id="filter-computername" placeholder="Computer name">
+                                </div>
+                            </th>
+                        </tr>
                     </thead>
                     <tbody id="logsTableBody"></tbody>
                 </table>
@@ -149,99 +212,7 @@
     </div>
 
     <script>
-        // Initialize Firebase with error handling
-        try {
-            const firebaseConfig = {
-                apiKey: "AIzaSyD_Q_igfCTHHbsYvX4BeG_HkNOHnIBrssQ",
-                authDomain: "ip-region-check.firebaseapp.com",
-                projectId: "ip-region-check",
-                storageBucket: "ip-region-check.firebasestorage.app",
-                messagingSenderId: "246807877976",
-                appId: "1:246807877976:web:5572c22e94924aeb3c2d2d",
-                measurementId: "G-C4JRPR9ERT"
-            };
-            firebase.initializeApp(firebaseConfig);
-            const db = firebase.firestore();
-            console.log("Firebase initialized successfully");
-
-            // Function to show error message
-            function showError(message) {
-                const errorDiv = document.getElementById("errorMessage");
-                errorDiv.textContent = message;
-                errorDiv.style.display = "block";
-            }
-
-            // Function to create table row
-            function createTableRow(doc, index) {
-                const data = doc.data();
-                const isFilteredOut = data.url === "/mine/list";
-                const rowClass = isFilteredOut ? "hidden-row" : "";
-
-                return `
-                    <tr class="${rowClass} new-row" data-url="${data.url}" data-id="${doc.id}">
-                        <td>${index}</td>
-                        <td>${data.timestamp || "N/A"}</td>
-                        <td>${data.country || "N/A"}</td>
-                        <td>${data.regionName || "N/A"}</td>
-                        <td>${data.city || "N/A"}</td>
-                        <td>${data.method || "N/A"}</td>
-                        <td>${data.source || "N/A"}</td>
-                        <td>${data.ip || "N/A"}</td>
-                        <td>${data.url || "N/A"}</td>
-                        <td>${data.computername || "N/A"}</td>
-                    </tr>
-                `;
-            }
-
-            // Real-time listener with error handling
-            let rowCount = 0;
-            const unsubscribe = db.collection("requests")
-                .orderBy("timestamp", "asc")
-                .onSnapshot((snapshot) => {
-                    const tableBody = document.getElementById("logsTableBody");
-
-                    snapshot.docChanges().forEach((change) => {
-                        try {
-                            if (change.type === "added") {
-                                rowCount++;
-                                const newRow = createTableRow(change.doc, rowCount);
-                                tableBody.insertAdjacentHTML("afterbegin", newRow);
-
-                                // Animation: Fade in the newly added row
-                                setTimeout(() => {
-                                    const row = document.querySelector(`tr[data-id="${change.doc.id}"]`);
-                                    if (row) row.classList.remove("new-row");
-                                }, 2000);
-                            } else if (change.type === "modified") {
-                                const row = document.querySelector(`tr[data-id="${change.doc.id}"]`);
-                                if (row) {
-                                    const index = row.querySelector("td").textContent;
-                                    const updatedRow = createTableRow(change.doc, index);
-                                    row.outerHTML = updatedRow;
-                                }
-                            } else if (change.type === "removed") {
-                                const row = document.querySelector(`tr[data-id="${change.doc.id}"]`);
-                                if (row) row.remove();
-                            }
-                        } catch (err) {
-                            console.error("Error handling document change:", err);
-                            showError("Error updating table");
-                        }
-                    });
-                }, (error) => {
-                    console.error("Firestore listener error:", error);
-                    showError("Error connecting to database: " + error.message);
-                });
-
-            // Clean up listener on page unload
-            window.addEventListener("unload", () => {
-                if (unsubscribe) unsubscribe();
-            });
-        } catch (err) {
-            console.error("Firebase initialization error:", err);
-            showError("Error initializing Firebase: " + err.message);
-        }
-
+        
         function toggleFilter() {
             const toggleBtn = document.getElementById("toggleFilter");
             const rows = document.querySelectorAll("tr[data-url='/mine/list']");
@@ -256,6 +227,163 @@
                 toggleBtn.textContent = "Show All";
             }
         }
+        
+        document.addEventListener("DOMContentLoaded", () => {
+            // Initialize Firebase
+            try {
+                const firebaseConfig = {
+                    apiKey: "AIzaSyD_Q_igfCTHHbsYvX4BeG_HkNOHnIBrssQ",
+                    authDomain: "ip-region-check.firebaseapp.com",
+                    projectId: "ip-region-check",
+                    storageBucket: "ip-region-check.appspot.com",
+                    messagingSenderId: "246807877976",
+                    appId: "1:246807877976:web:5572c22e94924aeb3c2d2d",
+                    measurementId: "G-C4JRPR9ERT"
+                };
+                firebase.initializeApp(firebaseConfig);
+                const db = firebase.firestore();
+                console.log("Firebase initialized successfully");
+
+                const errorDiv = document.getElementById("errorMessage");
+
+                function showError(message) {
+                    errorDiv.textContent = message;
+                    errorDiv.style.display = "block";
+                }
+
+                function hideError() {
+                    errorDiv.style.display = "none";
+                }
+
+                function createTableRow(doc, index) {
+                    const data = doc.data();
+                    const isFilteredOut = data.url === "/mine/list";
+                    const rowClass = isFilteredOut ? "hidden-row" : "";
+
+                    return `
+                        <tr class="${rowClass}" data-url="${data.url}" data-id="${doc.id}">
+                            <td>${index}</td>
+                            <td>${data.timestamp || "N/A"}</td>
+                            <td>${data.country || "N/A"}</td>
+                            <td>${data.regionName || "N/A"}</td>
+                            <td>${data.city || "N/A"}</td>
+                            <td>${data.method || "N/A"}</td>
+                            <td>${data.source || "N/A"}</td>
+                            <td>${data.ip || "N/A"}</td>
+                            <td>${data.url || "N/A"}</td>
+                            <td>${data.computername || "N/A"}</td>
+                        </tr>
+                    `;
+                }
+
+                let rowCount = 0;
+                const unsubscribe = db.collection("requests")
+                    .orderBy("timestamp", "asc")
+                    .onSnapshot((snapshot) => {
+                        const tableBody = document.getElementById("logsTableBody");
+
+                        snapshot.docChanges().forEach((change) => {
+                            try {
+                                if (change.type === "added") {
+                                    rowCount++;
+                                    const newRow = createTableRow(change.doc, rowCount);
+                                    tableBody.insertAdjacentHTML("afterbegin", newRow);
+
+                                    // Fade in the newly added row
+                                    setTimeout(() => {
+                                        const row = document.querySelector(`tr[data-id="${change.doc.id}"]`);
+                                        if (row) row.style.transition = "background-color 1s ease-in-out"; // Add any transitions you prefer
+                                    }, 2000);
+                                } else if (change.type === "modified") {
+                                    const row = document.querySelector(`tr[data-id="${change.doc.id}"]`);
+                                    if (row) {
+                                        const index = row.querySelector("td").textContent;
+                                        const updatedRow = createTableRow(change.doc, index);
+                                        row.outerHTML = updatedRow;
+                                    }
+                                } else if (change.type === "removed") {
+                                    const row = document.querySelector(`tr[data-id="${change.doc.id}"]`);
+                                    if (row) row.remove();
+                                }
+                            } catch (err) {
+                                console.error("Error handling document change:", err);
+                                showError("Error updating table");
+                            }
+                        });
+                    }, (error) => {
+                        console.error("Firestore listener error:", error);
+                        showError("Error connecting to database: " + error.message);
+                    });
+
+                window.addEventListener("unload", () => {
+                    if (unsubscribe) unsubscribe();
+                });
+
+                const filterInputs = document.querySelectorAll(".filter-input");
+                
+                // Debounce Function
+                let timeout;
+                filterInputs.forEach(input => {
+                    input.addEventListener("input", () => {
+                        clearTimeout(timeout);
+                        timeout = setTimeout(() => {
+                            updateTableBody();
+                        }, 300);
+                    });
+                });
+
+
+                function updateTableBody() {
+                    hideError(); // Hide the error when updating
+                    const timestampFilter = filterInputs[0].value.toLowerCase();
+                    const countryFilter = filterInputs[1].value.toLowerCase();
+                    const regionFilter = filterInputs[2].value.toLowerCase();
+                    const cityFilter = filterInputs[3].value.toLowerCase();
+                    const methodFilter = filterInputs[4].value.toLowerCase();
+                    const sourceFilter = filterInputs[5].value.toLowerCase();
+                    const ipFilter = filterInputs[6].value.toLowerCase();
+                    const urlFilter = filterInputs[7].value.toLowerCase();
+                    const computernameFilter = filterInputs[8].value.toLowerCase();
+
+                    db.collection("requests")
+                        .get()
+                        .then((snapshot) => {
+                            const tableBody = document.getElementById("logsTableBody");
+                            tableBody.innerHTML = ""; // clear table body
+                            let count = 0; // to keep the index of the displayed rows
+
+                            snapshot.forEach((doc) => {
+                                const data = doc.data();
+                                // Apply filters
+                                const isFilteredOut = 
+                                    (timestampFilter && !data.timestamp.toLowerCase().includes(timestampFilter)) ||
+                                    (countryFilter && !data.country.toLowerCase().includes(countryFilter)) ||
+                                    (regionFilter && !data.regionName.toLowerCase().includes(regionFilter)) ||
+                                    (cityFilter && !data.city.toLowerCase().includes(cityFilter)) ||
+                                    (methodFilter && !data.method.toLowerCase().includes(methodFilter)) ||
+                                    (sourceFilter && !data.source.toLowerCase().includes(sourceFilter)) ||
+                                    (ipFilter && !data.ip.toLowerCase().includes(ipFilter)) ||
+                                    (urlFilter && !data.url.toLowerCase().includes(urlFilter)) ||
+                                    (computernameFilter && (!data.computername || !data.computername.toLowerCase().includes(computernameFilter)));
+
+                                if (!isFilteredOut) {
+                                    count++;
+                                    const newRow = createTableRow(doc, count);
+                                    tableBody.insertAdjacentHTML("beforeend", newRow);
+                                }
+                            });
+                        })
+                        .catch((error) => {
+                            console.error("Error updating table:", error);
+                            showError("Error updating table: " + error.message);
+                        });
+                }
+
+            } catch (err) {
+                console.error("Firebase initialization error:", err);
+                showError("Error initializing Firebase: " + err.message);
+            }
+        });
     </script>
 </body>
 </html>
