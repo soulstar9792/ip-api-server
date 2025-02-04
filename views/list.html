@@ -152,6 +152,7 @@
                             <th>Source</th>
                             <th>IP</th>
                             <th>Request URL</th>
+                            <th>Flag</th>
                             <th>Computer name</th>
                         </tr>
                         <tr>
@@ -196,6 +197,11 @@
                             <th>
                                 <div class="filter-input-container">
                                     <input class="filter-input" type="text" id="filter-url" placeholder="URL">
+                                </div>
+                            </th>
+                            <th>
+                                <div class="filter-input-container">
+                                    <input class="filter-input" type="text" id="filter-flag" placeholder="Flag">
                                 </div>
                             </th>
                             <th>
@@ -271,6 +277,7 @@
                             <td>${data.source || "N/A"}</td>
                             <td>${data.ip || "N/A"}</td>
                             <td>${data.url || "N/A"}</td>
+                            <td>${data.flag || "N/A"}</td>
                             <td>${data.computername || "N/A"}</td>
                         </tr>
                     `;
@@ -343,7 +350,8 @@
                     const sourceFilter = filterInputs[5].value.toLowerCase();
                     const ipFilter = filterInputs[6].value.toLowerCase();
                     const urlFilter = filterInputs[7].value.toLowerCase();
-                    const computernameFilter = filterInputs[8].value.toLowerCase();
+                    const flagFilter = filterInputs[8].value.toLowerCase();
+                    const computernameFilter = filterInputs[9].value.toLowerCase();
 
                     db.collection("requests")
                         .get()
@@ -364,6 +372,7 @@
                                     (sourceFilter && !data.source.toLowerCase().includes(sourceFilter)) ||
                                     (ipFilter && !data.ip.toLowerCase().includes(ipFilter)) ||
                                     (urlFilter && !data.url.toLowerCase().includes(urlFilter)) ||
+                                    (flagFilter && !(!data.flag || !data.flag.toLowerCase().includes(flagFilter))) ||
                                     (computernameFilter && (!data.computername || !data.computername.toLowerCase().includes(computernameFilter)));
 
                                 if (!isFilteredOut) {
