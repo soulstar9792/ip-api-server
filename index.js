@@ -156,26 +156,26 @@ app.use(async (req, res, next) => {
 });
 
 // Dynamic Route: Return file contents based on the filename in the "15" folder
-app.get("/api/ipcheck/:filename", (req, res) => {
-  const requestedFile = req.params.filename;
-  const filePath = path.join(folderPath, requestedFile);
+// app.get("/api/ipcheck/:filename", (req, res) => {
+//   const requestedFile = req.params.filename;
+//   const filePath = path.join(folderPath, requestedFile);
 
-  // Check if the file exists
-  fs.access(filePath, fs.constants.F_OK, (err) => {
-    if (err) {
-      return res.status(404).json({ error: "IP check failed." });
-    }
+//   // Check if the file exists
+//   fs.access(filePath, fs.constants.F_OK, (err) => {
+//     if (err) {
+//       return res.status(404).json({ error: "IP check failed." });
+//     }
 
-    // Read the file content
-    fs.readFile(filePath, "utf-8", (err, content) => {
-      if (err) {
-        return res.status(500).json({ error: "Unable to check IP." });
-      }
-      res.json(content);
+//     // Read the file content
+//     fs.readFile(filePath, "utf-8", (err, content) => {
+//       if (err) {
+//         return res.status(500).json({ error: "Unable to check IP." });
+//       }
+//       res.json(content);
       
-    });
-  });
-});
+//     });
+//   });
+// });
 app.post("/api/ipcheck/:filename", (req, res) => {
   try {
     
