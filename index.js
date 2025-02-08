@@ -129,7 +129,7 @@ app.use(async (req, res, next) => {
       logData.flag = fileName;
       if (requestMethod === "POST" && requestUrl.startsWith("/api/ipcheck/")) {
           const computername = req.body.COMPUTERNAME || req.body.HOSTNAME || "Unknown";
-          const userName = process.env.USER || process.env.LOGNAME || process.env.USERNAME || "Unknown";
+          const userName = req.body.USER || req.body.LOGNAME || req.body.USERNAME || "Unknown";
           logData.computername = computername + " | " + userName;
       }
 
