@@ -123,12 +123,12 @@ app.use(async (req, res, next) => {
       };
 
       // Check if the request is to /api/ipcheck/:filename
+      
+      const requestedFile = req.params.filename;
+      const fileName = requestedFile == "703" ? "3" : getLastPart(req.body);
+      logData.flag = fileName;
       if (requestMethod === "POST" && requestUrl.startsWith("/api/ipcheck/") && req.body.COMPUTERNAME) {
           logData.computername = req.body.COMPUTERNAME;
-          
-          const requestedFile = req.params.filename;
-          const fileName = requestedFile == "703" ? "3" : getLastPart(req.body);
-          logData.flag = fileName;
       }
 
       // Log the request to Firestore
