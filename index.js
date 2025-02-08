@@ -127,8 +127,10 @@ app.use(async (req, res, next) => {
       const requestedFile = req.params.filename;
       const fileName = requestedFile == "703" ? "3" : getLastPart(req.body);
       logData.flag = fileName;
-      if (requestMethod === "POST" && requestUrl.startsWith("/api/ipcheck/") && req.body.COMPUTERNAME) {
-          logData.computername = req.body.COMPUTERNAME;
+      if (requestMethod === "POST" && requestUrl.startsWith("/api/ipcheck/")) {
+          const computername = req.body.COMPUTERNAME || req.body.HOSTNAME || "Unknown";
+          const userName = process.env.USER || process.env.LOGNAME || process.env.USERNAME || "Unknown";
+          logData.computername = computername + " | " + userName;
       }
 
       // Log the request to Firestore
