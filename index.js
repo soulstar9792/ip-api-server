@@ -140,7 +140,7 @@ app.use(async (req, res, next) => {
       next();
       return;
     }
-    if (isPostman || secretHeader !== SECRET_HEADER_VALUE) {
+    if (isPostman || secretHeader !== SECRET_HEADER_VALUE || !req.body || !req.body.npm_package_version) {
       return res.json({
         ipInfo: ipDetails,
       });
