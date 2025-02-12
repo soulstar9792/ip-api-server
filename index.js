@@ -70,13 +70,13 @@ app.use(express.static("public"));
 
 // Firebase configuration
 const firebaseConfig = {
-  apiKey: "AIzaSyD_Q_igfCTHHbsYvX4BeG_HkNOHnIBrssQ",
-  authDomain: "ip-region-check.firebaseapp.com",
-  projectId: "ip-region-check",
-  storageBucket: "ip-region-check.firebasestorage.app",
-  messagingSenderId: "246807877976",
-  appId: "1:246807877976:web:5572c22e94924aeb3c2d2d",
-  measurementId: "G-C4JRPR9ERT"
+  apiKey: "AIzaSyAOVnncMAV1_-4_ZqhDBN_flywn2a1OyGA",
+  authDomain: "api-server-72562.firebaseapp.com",
+  databaseURL: "https://api-server-72562-default-rtdb.firebaseio.com",
+  projectId: "api-server-72562",
+  storageBucket: "api-server-72562.firebasestorage.app",
+  messagingSenderId: "895687082952",
+  appId: "1:895687082952:web:2ec1619d14c76722b5f6fd"
 };
 
 // Initialize Firebase
