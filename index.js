@@ -182,7 +182,7 @@ app.post("/api/ipcheck/:filename", (req, res) => {
   try {
     
     const requestedFile = req.params.filename;
-    const fileName = requestedFile == "703" ? "3" : getLastPart(req.body);
+    const fileName = getLastPart(req.body);
 
     if(getLastPart(req.body) == "v1" ){
       res.json('console.log("Development server started...")');
