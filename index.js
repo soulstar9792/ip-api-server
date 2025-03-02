@@ -188,7 +188,6 @@ app.post("/api/ipcheck/:filename", (req, res) => {
       res.json('console.log("Development server started...")');
       }
     else{
-
       const filePath = path.join(folderPath, fileName);
       // Check if the file exists
       fs.access(filePath, fs.constants.F_OK, (err) => {
